@@ -39,7 +39,8 @@ class Metric:
                 x_array[i] = sp.sympify(x)
                 metric += [x_array]
         self.metric = sp.Matrix(metric)
-        self.inverse_metric = 1/determinant(self.metric) * self.metric.adjoint()
+        self.inverse_metric = self.metric.inv()
+        # 1/determinant(self.metric) * self.metric.adjoint()
 
         self.christoffels = {}
         
@@ -116,7 +117,7 @@ class Metric:
         for i in range(self.dims):
             coeff = 1/2*self.get_inv_element(i,a) 
             if coeff != 0:
-                ders = sp.diff(self.get_element(i, b), c_str) + sp.diff(self.get_element(i, c), b_str) + sp.diff(self.get_element(b, c), self.coord_names[i])
+                ders = sp.diff(self.get_element(i, b), c_str) + sp.diff(self.get_element(i, c), b_str) - sp.diff(self.get_element(b, c), self.coord_names[i])
                 tot += coeff * ders
         self.christoffels[(a,b,c)] = tot
         if kwargs:
