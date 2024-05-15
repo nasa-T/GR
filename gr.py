@@ -29,9 +29,10 @@ class Metric:
         self.dims = len(pre_met)
         metric = []
         for i, x in enumerate(pre_met):
-            if type(x) in ['list', 'tuple']:
-                assert len(x) == len(self.dims)
+            if type(x) in [list, tuple]:
+                assert len(x) == self.dims
                 metric += [x]
+                # print(metric)
             else:
                 x_array = np.zeros(self.dims, dtype=type(sp.sympify('0')))
                 for j in range(self.dims):
@@ -125,7 +126,7 @@ class Metric:
                 try:
                     assert key in self.coord_names
                 except:
-                    raise Exception('The keywords must be a valid coordinate name: {}'.format(self.coord_names))
+                    raise Exception('The keywords must be valid coordinate names: {}'.format(self.coord_names))
             tot = tot.subs(kwargs)
         
         return tot

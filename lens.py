@@ -1,4 +1,4 @@
-import pygame as pg
+# import pygame as pg
 from gr import *
 import numpy as np
 import sympy as sp
@@ -115,13 +115,15 @@ class Flashlight:
                 # angle of a light ray
                 if n_rays > 1:
                     ray_angle_phi = -width/2 + i*width/(n_rays-1)
-                    
+                    vx = np.cos((2*np.pi)*(ray_angle_phi+phi)/360)
+                    vy = np.sin((2*np.pi)*(ray_angle_phi+phi)/360)
+                    vz = 0
                 else:
                     ray_angle_phi = phi
-
-                vx = np.cos((2*np.pi)*(ray_angle_phi+phi)/360)
-                vy = np.sin((2*np.pi)*(ray_angle_phi+phi)/360)
-                vz = 0
+                    vx = np.cos((2*np.pi)*(ray_angle_phi)/360)
+                    vy = np.sin((2*np.pi)*(ray_angle_phi)/360)
+                    vz = 0
+                
             else:
                 if n_rays > 1:
                     ray_angle_theta = width/2
@@ -187,8 +189,8 @@ class Flashlight:
         y = float(gravitizer.y-photon.y)
         z = float(gravitizer.z-photon.z)
         r = np.sqrt(x**2 + y**2 + z**2)
-        if r <= gravitizer.rs:
-            return 1
+        # if r <= gravitizer.rs:
+        #     return 1
         if 'r' in gravitizer.metric.coord_names:
             
             th = np.arccos(z/r)
@@ -249,7 +251,7 @@ class Flashlight:
         # self.lam = 0
 
 class FlatSpace:
-    def __init__(self, x, y, z, rs):
+    def __init__(self, x, y, z):
 
         tt = -1
         s = 1
@@ -257,29 +259,20 @@ class FlatSpace:
         self.x = x
         self.y = y
         self.z = z
-        self.rs = rs
 
     def accelerate_photon(self, photon, dt):
         x = float(photon.x-self.x)
         y = float(photon.y-self.y)
         z = float(photon.z-self.z)
         vt = float(sp.sqrt((-self.metric.get_element(1,1)*photon.vlam_x**2 - self.metric.get_element(2,2)*photon.vlam_y**2 - self.metric.get_element(3,3)*photon.vlam_z**2)/self.metric.get_element(0,0)).subs({'x': x, 'y': y, 'z': z}))
-        # ax = float(-(self.metric.christoffel(1,0,0, x=photon.x, y=photon.y)*vt*vt + self.metric.christoffel(1,1,1, x=photon.x, y=photon.y)*photon.vx*photon.vx + self.metric.christoffel(1,2,2, x=photon.x, y=photon.y)*photon.vy*photon.vy + 2 * self.metric.christoffel(1,1,2, x=photon.x, y=photon.y)*photon.vx*photon.vy + 2*self.metric.christoffel(1,0,1, x=photon.x, y=photon.y)*vt*photon.vx + 2*self.metric.christoffel(1,0,2, x=photon.x, y=photon.y)*vt*photon.vy))
-        # ay = float(-(self.metric.christoffel(2,0,0, x=photon.x, y=photon.y)*vt*vt + self.metric.christoffel(2,1,1, x=photon.x, y=photon.y)*photon.vx*photon.vx + self.metric.christoffel(2,2,2, x=photon.x, y=photon.y)*photon.vy*photon.vy + 2 * self.metric.christoffel(2,1,2, x=photon.x, y=photon.y)*photon.vx*photon.vy + 2*self.metric.christoffel(2,0,1, x=photon.x, y=photon.y)*vt*photon.vx + 2*self.metric.christoffel(2,0,2, x=photon.x, y=photon.y)*vt*photon.vy))
 
         ax = float(-(self.metric.christoffel(1,0,0)*vt*vt + self.metric.christoffel(1,1,1)*photon.vx*photon.vx + self.metric.christoffel(1,2,2)*photon.vy*photon.vy + self.metric.christoffel(1,3,3)*photon.vz*photon.vz + 2*self.metric.christoffel(1,1,2)*photon.vx*photon.vy + 2*self.metric.christoffel(1,0,1)*vt*photon.vx + 2*self.metric.christoffel(1,0,2)*vt*photon.vy + 2*self.metric.christoffel(1,0,3)*vt*photon.vz + 2*self.metric.christoffel(1,1,3)*photon.vx*photon.vz + 2*self.metric.christoffel(1,2,3)*photon.vy*photon.vz).subs({'x': photon.x, 'y': photon.y, 'z': photon.z}))
         ay = float(-(self.metric.christoffel(2,0,0)*vt*vt + self.metric.christoffel(2,1,1)*photon.vx*photon.vx + self.metric.christoffel(2,2,2)*photon.vy*photon.vy + self.metric.christoffel(2,3,3)*photon.vz*photon.vz + 2*self.metric.christoffel(2,1,2)*photon.vx*photon.vy + 2*self.metric.christoffel(2,0,1)*vt*photon.vx + 2*self.metric.christoffel(2,0,2)*vt*photon.vy + 2*self.metric.christoffel(2,0,3)*vt*photon.vz + 2*self.metric.christoffel(2,1,3)*photon.vx*photon.vz + 2*self.metric.christoffel(2,2,3)*photon.vy*photon.vz).subs({'x': photon.x, 'y': photon.y, 'z': photon.z}))
 
         az = float(-(self.metric.christoffel(3,0,0)*vt*vt + self.metric.christoffel(3,1,1)*photon.vx*photon.vx + self.metric.christoffel(3,2,2)*photon.vy*photon.vy + self.metric.christoffel(3,3,3)*photon.vz*photon.vz + 2*self.metric.christoffel(3,1,2)*photon.vx*photon.vy + 2*self.metric.christoffel(3,0,1)*vt*photon.vx + 2*self.metric.christoffel(3,0,2)*vt*photon.vy + 2*self.metric.christoffel(3,0,3)*vt*photon.vz + 2*self.metric.christoffel(3,1,3)*photon.vx*photon.vz + 2*self.metric.christoffel(3,2,3)*photon.vy*photon.vz).subs({'x': photon.x, 'y': photon.y, 'z': photon.z}))
 
-        # ax = float(-(self.metric.christoffel(1,1,1)*photon.vx*photon.vx + self.metric.christoffel(1,2,2)*photon.vy*photon.vy + 2*self.metric.christoffel(1,1,2)*photon.vx*photon.vy).subs({'x': photon.x, 'y': photon.y}))
-        # ay = float(-(self.metric.christoffel(2,1,1)*photon.vx*photon.vx + self.metric.christoffel(2,2,2)*photon.vy*photon.vy + 2*self.metric.christoffel(2,1,2)*photon.vx*photon.vy).subs({'x': photon.x, 'y': photon.y}))
         ut = float(sp.sqrt(-1/self.metric.get_element(0,0)).subs({'x': x, 'y': y, 'z': z}))
         photon.accelerate(ax, ay, az, dt, vt)
-
-    # def __contains__(self, photon):
-    #     r = np.sqrt((self.x - photon.x)**2 + (self.y - photon.y)**2 + (self.z - photon.z)**2)
-    #     return r < self.rs
 
 
 class SchwarzschildGravitizer2D:
@@ -302,14 +295,10 @@ class SchwarzschildGravitizer2D:
         x = float(photon.x-self.x)
         y = float(photon.y-self.y)
         vt = float(sp.sqrt((-self.metric.get_element(1,1)*photon.vlam_x**2 - self.metric.get_element(2,2)*photon.vlam_y**2)/self.metric.get_element(0,0)).subs({'x': x, 'y': y}))
-        # ax = float(-(self.metric.christoffel(1,0,0, x=photon.x, y=photon.y)*vt*vt + self.metric.christoffel(1,1,1, x=photon.x, y=photon.y)*photon.vx*photon.vx + self.metric.christoffel(1,2,2, x=photon.x, y=photon.y)*photon.vy*photon.vy + 2 * self.metric.christoffel(1,1,2, x=photon.x, y=photon.y)*photon.vx*photon.vy + 2*self.metric.christoffel(1,0,1, x=photon.x, y=photon.y)*vt*photon.vx + 2*self.metric.christoffel(1,0,2, x=photon.x, y=photon.y)*vt*photon.vy))
-        # ay = float(-(self.metric.christoffel(2,0,0, x=photon.x, y=photon.y)*vt*vt + self.metric.christoffel(2,1,1, x=photon.x, y=photon.y)*photon.vx*photon.vx + self.metric.christoffel(2,2,2, x=photon.x, y=photon.y)*photon.vy*photon.vy + 2 * self.metric.christoffel(2,1,2, x=photon.x, y=photon.y)*photon.vx*photon.vy + 2*self.metric.christoffel(2,0,1, x=photon.x, y=photon.y)*vt*photon.vx + 2*self.metric.christoffel(2,0,2, x=photon.x, y=photon.y)*vt*photon.vy))
 
         ax = float(-(self.metric.christoffel(1,0,0)*vt*vt + self.metric.christoffel(1,1,1)*photon.vx*photon.vx + self.metric.christoffel(1,2,2)*photon.vy*photon.vy + 2*self.metric.christoffel(1,1,2)*photon.vx*photon.vy + 2*self.metric.christoffel(1,0,1)*vt*photon.vx + 2*self.metric.christoffel(1,0,2)*vt*photon.vy).subs({'x': photon.x, 'y': photon.y}))
         ay = float(-(self.metric.christoffel(2,0,0)*vt*vt + self.metric.christoffel(2,1,1)*photon.vx*photon.vx + self.metric.christoffel(2,2,2)*photon.vy*photon.vy + 2 * self.metric.christoffel(2,1,2)*photon.vx*photon.vy + 2*self.metric.christoffel(2,0,1)*vt*photon.vx + 2*self.metric.christoffel(2,0,2)*vt*photon.vy).subs({'x': photon.x, 'y': photon.y}))
-        # print(vt,ax,ay)
-        # ax = float(-(self.metric.christoffel(1,1,1)*photon.vx*photon.vx + self.metric.christoffel(1,2,2)*photon.vy*photon.vy + 2*self.metric.christoffel(1,1,2)*photon.vx*photon.vy).subs({'x': photon.x, 'y': photon.y}))
-        # ay = float(-(self.metric.christoffel(2,1,1)*photon.vx*photon.vx + self.metric.christoffel(2,2,2)*photon.vy*photon.vy + 2*self.metric.christoffel(2,1,2)*photon.vx*photon.vy).subs({'x': photon.x, 'y': photon.y}))
+
         ut = float(sp.sqrt(-1/self.metric.get_element(0,0)).subs({'x': x, 'y': y}))
         photon.accelerate(ax, ay, 0, dlam, vt)
 
@@ -337,16 +326,12 @@ class SchwarzschildGravitizer3D:
         y = float(photon.y-self.y)
         z = float(photon.z-self.z)
         vt = float(sp.sqrt((-self.metric.get_element(1,1)*photon.vlam_x**2 - self.metric.get_element(2,2)*photon.vlam_y**2 - self.metric.get_element(3,3)*photon.vlam_z**2)/self.metric.get_element(0,0)).subs({'x': x, 'y': y, 'z': z}))
-        # ax = float(-(self.metric.christoffel(1,0,0, x=photon.x, y=photon.y)*vt*vt + self.metric.christoffel(1,1,1, x=photon.x, y=photon.y)*photon.vx*photon.vx + self.metric.christoffel(1,2,2, x=photon.x, y=photon.y)*photon.vy*photon.vy + 2 * self.metric.christoffel(1,1,2, x=photon.x, y=photon.y)*photon.vx*photon.vy + 2*self.metric.christoffel(1,0,1, x=photon.x, y=photon.y)*vt*photon.vx + 2*self.metric.christoffel(1,0,2, x=photon.x, y=photon.y)*vt*photon.vy))
-        # ay = float(-(self.metric.christoffel(2,0,0, x=photon.x, y=photon.y)*vt*vt + self.metric.christoffel(2,1,1, x=photon.x, y=photon.y)*photon.vx*photon.vx + self.metric.christoffel(2,2,2, x=photon.x, y=photon.y)*photon.vy*photon.vy + 2 * self.metric.christoffel(2,1,2, x=photon.x, y=photon.y)*photon.vx*photon.vy + 2*self.metric.christoffel(2,0,1, x=photon.x, y=photon.y)*vt*photon.vx + 2*self.metric.christoffel(2,0,2, x=photon.x, y=photon.y)*vt*photon.vy))
 
         ax = float(-(self.metric.christoffel(1,0,0)*vt*vt + self.metric.christoffel(1,1,1)*photon.vx*photon.vx + self.metric.christoffel(1,2,2)*photon.vy*photon.vy + self.metric.christoffel(1,3,3)*photon.vz*photon.vz + 2*self.metric.christoffel(1,1,2)*photon.vx*photon.vy + 2*self.metric.christoffel(1,0,1)*vt*photon.vx + 2*self.metric.christoffel(1,0,2)*vt*photon.vy + 2*self.metric.christoffel(1,0,3)*vt*photon.vz + 2*self.metric.christoffel(1,1,3)*photon.vx*photon.vz + 2*self.metric.christoffel(1,2,3)*photon.vy*photon.vz).subs({'x': photon.x, 'y': photon.y, 'z': photon.z}))
         ay = float(-(self.metric.christoffel(2,0,0)*vt*vt + self.metric.christoffel(2,1,1)*photon.vx*photon.vx + self.metric.christoffel(2,2,2)*photon.vy*photon.vy + self.metric.christoffel(2,3,3)*photon.vz*photon.vz + 2*self.metric.christoffel(2,1,2)*photon.vx*photon.vy + 2*self.metric.christoffel(2,0,1)*vt*photon.vx + 2*self.metric.christoffel(2,0,2)*vt*photon.vy + 2*self.metric.christoffel(2,0,3)*vt*photon.vz + 2*self.metric.christoffel(2,1,3)*photon.vx*photon.vz + 2*self.metric.christoffel(2,2,3)*photon.vy*photon.vz).subs({'x': photon.x, 'y': photon.y, 'z': photon.z}))
 
         az = float(-(self.metric.christoffel(3,0,0)*vt*vt + self.metric.christoffel(3,1,1)*photon.vx*photon.vx + self.metric.christoffel(3,2,2)*photon.vy*photon.vy + self.metric.christoffel(3,3,3)*photon.vz*photon.vz + 2*self.metric.christoffel(3,1,2)*photon.vx*photon.vy + 2*self.metric.christoffel(3,0,1)*vt*photon.vx + 2*self.metric.christoffel(3,0,2)*vt*photon.vy + 2*self.metric.christoffel(3,0,3)*vt*photon.vz + 2*self.metric.christoffel(3,1,3)*photon.vx*photon.vz + 2*self.metric.christoffel(3,2,3)*photon.vy*photon.vz).subs({'x': photon.x, 'y': photon.y, 'z': photon.z}))
 
-        # ax = float(-(self.metric.christoffel(1,1,1)*photon.vx*photon.vx + self.metric.christoffel(1,2,2)*photon.vy*photon.vy + 2*self.metric.christoffel(1,1,2)*photon.vx*photon.vy).subs({'x': photon.x, 'y': photon.y}))
-        # ay = float(-(self.metric.christoffel(2,1,1)*photon.vx*photon.vx + self.metric.christoffel(2,2,2)*photon.vy*photon.vy + 2*self.metric.christoffel(2,1,2)*photon.vx*photon.vy).subs({'x': photon.x, 'y': photon.y}))
         ut = float(sp.sqrt(-1/self.metric.get_element(0,0)).subs({'x': x, 'y': y, 'z': z}))
         photon.accelerate(ax, ay, az, dt, vt)
 
@@ -375,30 +360,15 @@ class SchwarzschildGravitizerSpherical:
         th = np.arccos(z/r)
         phi = np.sign(y)*np.arccos(x/np.sqrt(x**2+y**2))
         vr = x/r * photon.vlam_x + y/r * photon.vlam_y + z/r * photon.vlam_z
-        # vth = x*z/sp.sqrt(1-(z/r)**2) *1/r**3 * photon.vlam_x + y*z/sp.sqrt(1-(z/r)**2) *1/r**3 * photon.vlam_y + ((z**2/r**3) - 1/r)/sp.sqrt(1-(z/r)**2) * photon.vlam_z
 
         vth = (x*z*photon.vlam_x - x**2*photon.vlam_z + y*(z*photon.vlam_y - y*photon.vlam_z))/(np.sqrt((x**2+y**2)/r**2)*r**3)
         vphi = (-y*photon.vlam_x + x * photon.vlam_y)/(x**2 + y**2)
-        # if x != 0:
-        #     vphi = -y/(x**2 * (1+(y/x)**2)) * photon.vlam_x + 1/(x * (1+(y/x)**2)) * photon.vlam_y
-        # else:
-        #     vphi = -photon.vlam_x/photon.y
+
         vt = float(sp.sqrt((-self.metric.get_element(1,1)*vr**2 - self.metric.get_element(2,2)*vth**2 - self.metric.get_element(3,3)*vphi**2)/self.metric.get_element(0,0)).subs({'r': r, 'th': th, 'phi': phi}))
-        # print(vt)
-        # ax = float(-(self.metric.christoffel(1,0,0, x=photon.x, y=photon.y)*vt*vt + self.metric.christoffel(1,1,1, x=photon.x, y=photon.y)*photon.vx*photon.vx + self.metric.christoffel(1,2,2, x=photon.x, y=photon.y)*photon.vy*photon.vy + 2 * self.metric.christoffel(1,1,2, x=photon.x, y=photon.y)*photon.vx*photon.vy + 2*self.metric.christoffel(1,0,1, x=photon.x, y=photon.y)*vt*photon.vx + 2*self.metric.christoffel(1,0,2, x=photon.x, y=photon.y)*vt*photon.vy))
-        # ay = float(-(self.metric.christoffel(2,0,0, x=photon.x, y=photon.y)*vt*vt + self.metric.christoffel(2,1,1, x=photon.x, y=photon.y)*photon.vx*photon.vx + self.metric.christoffel(2,2,2, x=photon.x, y=photon.y)*photon.vy*photon.vy + 2 * self.metric.christoffel(2,1,2, x=photon.x, y=photon.y)*photon.vx*photon.vy + 2*self.metric.christoffel(2,0,1, x=photon.x, y=photon.y)*vt*photon.vx + 2*self.metric.christoffel(2,0,2, x=photon.x, y=photon.y)*vt*photon.vy))
 
         ar = float(-(self.metric.christoffel(1,0,0)*vt*vt + self.metric.christoffel(1,1,1)*vr*vr + self.metric.christoffel(1,2,2)*vth*vth + self.metric.christoffel(1,3,3)*vphi*vphi + 2*self.metric.christoffel(1,0,1)*vt*vr + 2*self.metric.christoffel(1,0,2)*vt*vth + 2*self.metric.christoffel(1,0,3)*vt*vphi + 2*self.metric.christoffel(1,1,2)*vr*vth + 2*self.metric.christoffel(1,1,3)*vr*vphi + 2*self.metric.christoffel(1,2,3)*vth*vphi).subs({'r': r, 'th': th, 'phi': phi}))
         ath = float(-(self.metric.christoffel(2,0,0)*vt*vt + self.metric.christoffel(2,1,1)*vr*vr + self.metric.christoffel(2,2,2)*vth*vth + self.metric.christoffel(2,3,3)*vphi*vphi + 2*self.metric.christoffel(2,0,1)*vt*vr + 2*self.metric.christoffel(2,0,2)*vt*vth + 2*self.metric.christoffel(2,0,3)*vt*vphi + 2*self.metric.christoffel(2,1,2)*vr*vth + 2*self.metric.christoffel(2,1,3)*vr*vphi + 2*self.metric.christoffel(2,2,3)*vth*vphi).subs({'r': r, 'th': th, 'phi': phi}))
         aphi = float(-(self.metric.christoffel(3,0,0)*vt*vt + self.metric.christoffel(3,1,1)*vr*vr + self.metric.christoffel(3,2,2)*vth*vth + self.metric.christoffel(3,3,3)*vphi*vphi + 2*self.metric.christoffel(3,0,1)*vt*vr + 2*self.metric.christoffel(3,0,2)*vt*vth + 2*self.metric.christoffel(3,0,3)*vt*vphi + 2*self.metric.christoffel(3,1,2)*vr*vth + 2*self.metric.christoffel(3,1,3)*vr*vphi + 2*self.metric.christoffel(3,2,3)*vth*vphi).subs({'r': r, 'th': th, 'phi': phi}))
-
-        # if abs(ath+aphi) < 1e-7:
-        #     ar = 0
-        # print(-(self.metric.christoffel(1,0,0)*vt*vt + self.metric.christoffel(1,1,1)*vr*vr + self.metric.christoffel(1,2,2)*vth*vth + self.metric.christoffel(1,3,3)*vphi*vphi + 2*self.metric.christoffel(1,0,1)*vt*vr + 2*self.metric.christoffel(1,0,2)*vt*vth + 2*self.metric.christoffel(1,0,3)*vt*vphi + 2*self.metric.christoffel(1,1,2)*vr*vth + 2*self.metric.christoffel(1,1,3)*vr*vphi + 2*self.metric.christoffel(1,2,3)*vth*vphi))
-        #  -(self.metric.christoffel(2,0,0)*vt*vt + self.metric.christoffel(2,1,1)*vr*vr + self.metric.christoffel(2,2,2)*vth*vth + self.metric.christoffel(2,3,3)*vphi*vphi + 2*self.metric.christoffel(2,0,1)*vt*vr + 2*self.metric.christoffel(2,0,2)*vt*vth + 2*self.metric.christoffel(2,0,3)*vt*vphi + 2*self.metric.christoffel(2,1,2)*vr*vth + 2*self.metric.christoffel(2,1,3)*vr*vphi + 2*self.metric.christoffel(2,2,3)*vth*vphi), -(self.metric.christoffel(3,0,0)*vt*vt + self.metric.christoffel(3,1,1)*vr*vr + self.metric.christoffel(3,2,2)*vth*vth + self.metric.christoffel(3,3,3)*vphi*vphi + 2*self.metric.christoffel(3,0,1)*vt*vr + 2*self.metric.christoffel(3,0,2)*vt*vth + 2*self.metric.christoffel(3,0,3)*vt*vphi + 2*self.metric.christoffel(3,1,2)*vr*vth + 2*self.metric.christoffel(3,1,3)*vr*vphi + 2*self.metric.christoffel(3,2,3)*vth*vphi))
-        # ax = float(-r*(np.sin(th)**2 * vphi**2 + vth**2) + ar)
-        # ay = float(2*vr*vth + r*(-np.cos(th)*np.sin(th)*vphi**2 + ath))
-        # az = float(2*vphi*(np.sin(th)*vr + np.cos(th)*r*vth) + r*np.sin(th)*aphi)
 
         ax = float(-np.cos(phi)*r*np.sin(th)*(vphi**2) - 2*np.sin(phi)*np.sin(th)*vphi*vr - 2*np.cos(th)*r*np.sin(phi)*vphi*vth + 2*np.cos(phi)*np.cos(th)*vr*vth - np.cos(phi)*r*np.sin(th)*(vth**2) - r*np.sin(phi)*np.sin(th)*aphi + np.cos(phi)*np.sin(th)*ar + np.cos(phi)*np.cos(th)*r*ath)
         
@@ -406,11 +376,65 @@ class SchwarzschildGravitizerSpherical:
 
         az = float(-2 * np.sin(th)*vr*vth - np.cos(th)*r*(vth**2) + np.cos(th)*ar - r*np.sin(th)*ath)
 
-        # if abs(ax + ay + az) > 2*self.rs:
-        #     ax = np.sign(ax)
-        #     ay = np.sign(ay)
-        #     az = np.sign(az)
-        ut = float(sp.sqrt(-1/self.metric.get_element(0,0)).subs({'r': r, 'th': th, 'phi': phi}))
+        photon.accelerate(ax, ay, az, dt, vt)
+    
+    def __contains__(self, photon):
+        r = np.sqrt((self.x - photon.x)**2 + (self.y - photon.y)**2 + (self.z - photon.z)**2)
+        return r < self.rs
+
+class KerrGravitizer:
+    def __init__(self, x, y, z, rs, J):
+        a = 2*J/rs
+        rho2 = 'r**2 + {}**2 * cos(th)**2'.format(a)
+        tr = 'r**2 - {0}*r + {1}**2'.format(rs, a)
+        tt = '-(1 - {0}*r/{1})'.format(rs, rho2)
+        pht = '-(2*{0}*{1}*r*sin(th)**2/{2})'.format(rs,a,rho2)
+        rr = '{0}/{1}'.format(rho2,tr)
+        thth = '{}'.format(rho2)
+        phph = '(r**2 + {0}**2 + {1}*r*{0}**2 * sin(th)**2/{2})*sin(th)**2'.format(a,rs,rho2)
+        self.metric = Metric([tt,'0','0',pht], rr, thth, [pht,'0','0',phph], coords='t r th phi')
+        self.x = x
+        self.y = y
+        self.z = z
+        self.rs = rs
+
+    def accelerate_photon(self, photon, dt):
+        if photon in self:
+            photon.absorb()
+            return
+        x = float(photon.x-self.x)
+        y = float(photon.y-self.y)
+        z = float(photon.z-self.z)
+        r = np.sqrt(x**2 + y**2 + z**2)
+        th = np.arccos(z/r)
+        phi = np.sign(y)*np.arccos(x/np.sqrt(x**2+y**2))
+        vr = x/r * photon.vlam_x + y/r * photon.vlam_y + z/r * photon.vlam_z
+
+        vth = (x*z*photon.vlam_x - x**2*photon.vlam_z + y*(z*photon.vlam_y - y*photon.vlam_z))/(np.sqrt((x**2+y**2)/r**2)*r**3)
+        vphi = (-y*photon.vlam_x + x * photon.vlam_y)/(x**2 + y**2)
+
+        # vt is now given by 0 = gtt*vt**2 + (2*gta*va)*vt + gab *va*vb
+        # so we have the quadratic equation to solve for vt
+        a = self.metric.get_element(0,0)
+        b = 0
+        c = 0
+        for coord, vel in [('r',vr), ('th',vth), ('phi',vphi)]:
+            b += 2 * self.metric.get_element('t',coord) * vel
+            for coord2, vel2 in [('r',vr), ('th',vth), ('phi',vphi)]:
+                c += self.metric.get_element(coord, coord2) * vel * vel2
+        vt = float(((-b - sp.sqrt(b**2 - 4*a*c))/(2*a)).subs({'r': r, 'th': th, 'phi': phi}))
+        # vt = float(sp.sqrt((-self.metric.get_element(1,1)*vr**2 - self.metric.get_element(2,2)*vth**2 - self.metric.get_element(3,3)*vphi**2)/self.metric.get_element(0,0)).subs({'r': r, 'th': th, 'phi': phi}))
+
+        ar = float(-(self.metric.christoffel(1,0,0)*vt*vt + self.metric.christoffel(1,1,1)*vr*vr + self.metric.christoffel(1,2,2)*vth*vth + self.metric.christoffel(1,3,3)*vphi*vphi + 2*self.metric.christoffel(1,0,1)*vt*vr + 2*self.metric.christoffel(1,0,2)*vt*vth + 2*self.metric.christoffel(1,0,3)*vt*vphi + 2*self.metric.christoffel(1,1,2)*vr*vth + 2*self.metric.christoffel(1,1,3)*vr*vphi + 2*self.metric.christoffel(1,2,3)*vth*vphi).subs({'r': r, 'th': th, 'phi': phi}))
+        ath = float(-(self.metric.christoffel(2,0,0)*vt*vt + self.metric.christoffel(2,1,1)*vr*vr + self.metric.christoffel(2,2,2)*vth*vth + self.metric.christoffel(2,3,3)*vphi*vphi + 2*self.metric.christoffel(2,0,1)*vt*vr + 2*self.metric.christoffel(2,0,2)*vt*vth + 2*self.metric.christoffel(2,0,3)*vt*vphi + 2*self.metric.christoffel(2,1,2)*vr*vth + 2*self.metric.christoffel(2,1,3)*vr*vphi + 2*self.metric.christoffel(2,2,3)*vth*vphi).subs({'r': r, 'th': th, 'phi': phi}))
+        aphi = float(-(self.metric.christoffel(3,0,0)*vt*vt + self.metric.christoffel(3,1,1)*vr*vr + self.metric.christoffel(3,2,2)*vth*vth + self.metric.christoffel(3,3,3)*vphi*vphi + 2*self.metric.christoffel(3,0,1)*vt*vr + 2*self.metric.christoffel(3,0,2)*vt*vth + 2*self.metric.christoffel(3,0,3)*vt*vphi + 2*self.metric.christoffel(3,1,2)*vr*vth + 2*self.metric.christoffel(3,1,3)*vr*vphi + 2*self.metric.christoffel(3,2,3)*vth*vphi).subs({'r': r, 'th': th, 'phi': phi}))
+
+        ax = float(-np.cos(phi)*r*np.sin(th)*(vphi**2) - 2*np.sin(phi)*np.sin(th)*vphi*vr - 2*np.cos(th)*r*np.sin(phi)*vphi*vth + 2*np.cos(phi)*np.cos(th)*vr*vth - np.cos(phi)*r*np.sin(th)*(vth**2) - r*np.sin(phi)*np.sin(th)*aphi + np.cos(phi)*np.sin(th)*ar + np.cos(phi)*np.cos(th)*r*ath)
+        
+        ay = float(-r*np.sin(phi)*np.sin(th)*(vphi**2) + 2*np.cos(phi)*np.sin(th)*vphi*vr + 2*np.cos(phi)*np.cos(th)*r*vphi*vth + 2*np.cos(th)*np.sin(phi)*vr*vth - r*np.sin(phi)*np.sin(th)*(vth**2) + np.cos(phi)*r*np.sin(th)*aphi + np.sin(phi)*np.sin(th)*ar + np.cos(th)*r*np.sin(phi)*ath)
+
+        az = float(-2 * np.sin(th)*vr*vth - np.cos(th)*r*(vth**2) + np.cos(th)*ar - r*np.sin(th)*ath)
+
         photon.accelerate(ax, ay, az, dt, vt)
     
     def __contains__(self, photon):
@@ -455,8 +479,14 @@ class Simulator:
             fig.set_figwidth(8)
             fig.set_figheight(8)
         if ax.name == '3d':
+            xs = []
+            ys = []
+            zs = []
             for source in self.sources:
                 for ph in source.photons:
+                    xs += ph.x_list
+                    ys += ph.y_list
+                    zs += ph.z_list
                     ax.plot(ph.x_list, ph.y_list, ph.z_list)
             if type(self.gravitizer) != FlatSpace:
                 u, v = np.mgrid[0:2*np.pi:20j, 0:np.pi:10j]
@@ -464,6 +494,11 @@ class Simulator:
                 y = self.gravitizer.rs*np.sin(u)*np.sin(v)
                 z = self.gravitizer.rs*np.cos(v)
                 ax.plot_surface(x, y, z, color="black")
+                
+                xs += list(x.flatten())
+                ys += list(y.flatten())
+                zs += list(z.flatten())
+            ax.set_box_aspect((np.ptp(xs), np.ptp(ys), np.ptp(zs)))
         else:
             for source in self.sources:
                 for ph in source.photons:
@@ -475,13 +510,23 @@ class Simulator:
                     # ax.add_collection(lc)
                     ax.scatter(ph.x_list, ph.y_list, c=ph.e_list, s=8,cmap='Spectral', edgecolor='none')
                     # ax.plot(ph.x_list, ph.y_list)
-            cir = mpatches.Circle((self.gravitizer.x, self.gravitizer.y), self.gravitizer.rs, color="black")
-
-            ax.add_patch(cir)
+            if type(self.gravitizer) != FlatSpace:
+                cir = mpatches.Circle((self.gravitizer.x, self.gravitizer.y), self.gravitizer.rs, color="black")
+                ax.add_patch(cir)
+            ax.set_aspect('equal')
             # ax.set_xlim(x.min(), x.max())
             # ax.set_ylim(-1.1, 1.1
         
         # plt.plot(grav.x, grav.y, 'o', markersize=)
+
+    def find_focii(self):
+        # basically find where photons probably crossed
+        coord_lists = []
+        for source in self.sources:
+            for ph in source.photons:
+                for ph2 in source.photons:
+                    coord_lists.append([ph.x_list, ph.y_list, ph.z_list])
+        
         
     def reset(self):
         self.lam = 0
