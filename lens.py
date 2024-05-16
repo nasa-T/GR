@@ -487,7 +487,8 @@ class Simulator:
                     xs += ph.x_list
                     ys += ph.y_list
                     zs += ph.z_list
-                    ax.plot(ph.x_list, ph.y_list, ph.z_list)
+                    ax.scatter(ph.x_list, ph.y_list, ph.z_list, c=ph.e_list, s=8,cmap='Spectral', edgecolor='none')
+                    # ax.plot(ph.x_list, ph.y_list, ph.z_list)
             if type(self.gravitizer) != FlatSpace:
                 u, v = np.mgrid[0:2*np.pi:20j, 0:np.pi:10j]
                 x = self.gravitizer.rs*np.cos(u)*np.sin(v)
